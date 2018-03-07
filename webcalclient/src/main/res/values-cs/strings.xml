@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CZECH -->
+<resources>
+
+<string name="gpl">Guidepost  Copyright (C) 2013  Michal Grezl \n
+Tento program je svobodný software: můžete jej šířit a upravovat podle ustanovení Obecné veřejné licence GNU (GNU General Public Licence), vydávané Free Software Foundation a to buď podle 3. verze této Licence, nebo (podle vašeho uvážení) kterékoli pozdější verze.
+Tento program je rozšiřován v naději, že bude užitečný, avšak BEZ JAKÉKOLIV ZÁRUKY. Neposkytují se ani odvozené záruky PRODEJNOSTI anebo VHODNOSTI PRO URČITÝ ÚČEL. Další podrobnosti hledejte v Obecné veřejné licenci GNU.
+Kopii Obecné veřejné licence GNU jste měli obdržet spolu s tímto programem. Pokud se tak nestalo, najdete ji zde: http://www.gnu.org/licenses/.
+</string>
+
+  <string name="remember">zapamatovat</string>
+  <string name="location">Pozice:</string>
+  <string name="author">Autor:</string>
+  <string name="cancel">Zrušit</string>
+  <string name="send">Poslat</string>
+  <string name="exit">Konec</string>
+  <string name="about">Jak na to:\nPro použití musíte sdílet obrázek například z Fotoaparátu nebo Galerie</string>
+  <string name="bye">Ukončit</string>
+  <string name="tryagain">Zkusit znovu</string>
+  <string name="uploadfailed">Přenos selhal</string>
+
+  <string name="app_name">webcalclient</string>
+  <string name="settings_password">Vaše tajné heslo</string>
+  <string name="settings_username">Vaše uživatelské jméno</string>
+  <string name="settings_url">URL Serveru Dokumenty/Webcalendar</string>
+  <string name="app_password">Heslo do Webcalendar </string>
+  <string name="app_username">Uživatelské jméno pro WebCalendar</string>
+  <string name="http_password">Heslo do Intranetu/Dokumenty</string>
+  <string name="http_username">Uživatelské jméno pro Intranetu/Dokumenty</string>
+  <string name="url">Webcalendar url</string>
+  <string name="users">Uživatelé</string>
+  <string name="pleasewait">Prosím čekejte ...</string>
+  <string name="connection_refused">Spojení odmítnuto</string>
+  <string name="preferences">Nastavení</string>
+  <string name="sync">Synchronizuj</string>
+  <string name="calendar">Kalendář</string>
+  <string name="views">Pohledy</string>
+  <string name="details">Detaily</string>
+  <string name="reminders">Upomínky</string>
+  <string name="repeat">Opakování</string>
+  <string name="participants">Účastníci</string>
+  <string name="selected_participants">Vybraní účastníci</string>
+  <string name="externals">Lidé odjinud</string>
+  <string name="confidential">Tajné</string>
+  <string name="xpublic">Veřejné</string>
+  <string name="xprivate">Soukromé</string>
+  <string name="monthstosync">Synchronizace</string>
+  <string name="monthstosync_desc">Kolik měsíců synchronizovat</string>
+  <string name="syncing">Synchronizuji</string>
+
+  <string name="editevent_save">Uložit</string>
+  <string name="editevent_settings">Nastavení</string>
+
+  <string name="none">Žádný</string>
+  <string name="daily">Denní</string>
+  <string name="weekly">Týdenní</string>
+  <string name="monthlyByDay">Měsíční (dle dne)</string>
+  <string name="monthlyByDate">Měsíční (by date)</string>
+  <string name="monthlyBySetPos">Měsíční (by position)</string>
+  <string name="yearly">Roční</string>
+  <string name="manual">Ručně</string>
+
+  <string name="calendar_add">Přidat novou událost...</string>
+  <string name="event_saved">Událost uložena...</string>
+  <string name="wrong_password">Špatné jméno nebo heslo</string>
+  <string name="brief_desc">Krátký popis:</string>
+  <string name="full_desc">Detailní popis:</string>
+  <string name="brief_title">Krátce</string>
+  <string name="full_title">Detailní popis události</string>
+  <string name="duration">Trvání:</string>
+  <string name="time">Čas:</string>
+  <string name="set_date">Nastav datum:</string>
+  <string name="date">Datum:</string>
+  <string name="access">Přístup:</string>
+  <string name="priority">Priorita:</string>
+  <string name="set_time">Nastav čas</string>
+
+  <string name="allday">Celodenní</string>
+  <string name="timed">Načasovaná</string>
+
+  <string name="workhoursfrom_desc">Kdy začíná pracovni doba, hodina včetně</string>
+  <string name="workhoursto_desc">Kdy končí pracovní doba, hodina včetně</string>
+  <string name="workhoursfrom">Začátek pracovní doby</string>
+  <string name="workhoursto">Konec pracovní doby</string>
+  <string name="no_inet">Žádné připojení k internetu</string>
+  <string name="repeat_not_implemented">Nastavené opakování není zatím podporováno, nemohu uložit.</string>
+  <string name="create_new_event">Vytvořena nová událost</string>
+
+  <string name="hour">Hodina</string>
+  <string name="event">Událost</string>
+  <string name="all_day">Celodenní</string>
+
+  <string name="users_calendars">Kalendáře uživatelů</string>
+  <string name="tables">SQL Tabulky</string>
+  <string name="my_calendar">Můj kalendář</string>
+  <string name="users_list">Seznam uživatelů</string>
+  <string name="views_list">Seznam pohledů</string>
+  <string name="sync_done">Synchronizace dokončena</string>
+  <string name="sync_error">Synchronizace ukončena kvůli chybám</string>
+
+</resources>
