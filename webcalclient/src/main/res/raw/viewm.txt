@@ -1,0 +1,87 @@
+<script>
+
+function get_events(u, d)
+{
+  var i;
+  var ret = "<table>";
+
+  for (i in events) {
+    var x = events[i];
+    if (x["day"] === d && x["user"] === u) {
+      ret += "<tr><td><span onclick='Android.show_event(" + x["id"] + ");'>" 
+          + "00:"
+          + x["event"]
+          + "<\/span><\/td><\/tr>";
+    }
+  }
+  ret += "<\/table>";
+  return ret;
+}
+
+function getMonday(d)
+{
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay() + 1);
+}
+
+function getSunday(d)
+{
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay() + 7);
+}
+
+function first_day_of_month(d)
+{
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+function last_day_of_month(d)
+{
+  return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+} 
+
+function display_calendar(year, month, day)
+{
+  month--;
+  if (month < 1) {
+    month = 1;
+  }
+
+  var html_content = "";
+  var FebNumberOfDays = "";
+  var date_now = new Date(year, month, day); 
+  var month = date_now.getMonth();
+  var current_month = month + 1; 
+  var prevMonth = month - 1;
+  var day = date_now.getDate();
+  var year = date_now.getFullYear();
+  // names of months and week days.
+  var monthNames = ["January","February","March","April","May","June","July","August","Septemb", "December"];
+  var dayNames = ["Monday","Tuesday","Wednesday","Thrusday","Friday", "Saturday","NedÄ:le"];
+  var monday = getMonday(date_now);
+  var this_monday = getMonday(date_now).getDate();
+  var this_sunday = getSunday(date_now).getDate(); 
+  html_content += "<table class='t'>";
+  //draw users
+  html_content += "<td>&nbsp;<\/td>"
+
+  for (iu = 0; iu < users.length; iu++) {
+    html_content += "<th>"+users[iu]+"<\/th>";
+  }
+
+  html_content += "<tr>";
+
+  var d = first_day_of_month(date_now);
+  var day;
+  for (i = 0; i < last_day_of_month(date_now).getDate(); i++) {
+    day = d.getDate()
+    html_content += "<tr>";
+    html_content += "<td class='hi'>"+ day +"<\/td>";
+    for (iu = 0; iu < users.length; ++iu) {
+      html_content += "<td class='lo'>" + get_events(users[iu], day) + "<\/td>";
+    }
+    d.setDate(d.getDate() + 1);
+    html_content += "<\/tr>";
+  }
+  document.getElementById("calendar").innerHTML = html_content;
+}
+
+</script>

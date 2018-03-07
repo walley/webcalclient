@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+  <ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:scrollbars="none"
+    android:layout_weight="1">
+    <LinearLayout
+      android:id="@+id/widget32"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:orientation="vertical">
+
+<!-- Brief -->
+
+      <TextView
+        android:id="@+id/widget37"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/brief_desc"/>
+      <EditText
+        android:id="@+id/brief_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="b"
+        android:textSize="18sp" />
+
+    <View
+    android:layout_width="wrap_content"
+    android:layout_height="1dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/line_separator" />
+<!-- Full -->
+
+      <TextView
+        android:id="@+id/widget39"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/full_desc"/>
+      <EditText
+        android:inputType="textMultiLine"
+        android:lines="8"
+        android:minLines="8"
+        android:gravity="top|left"
+        android:maxLines="8"
+        android:id="@+id/full_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit\nText"
+        android:textSize="18sp"
+        android:scrollHorizontally="false"
+        android:scrollbars="vertical" />
+
+    <View
+    android:layout_width="wrap_content"
+    android:layout_height="1dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/line_separator" />
+<!-- Access -->
+
+      <TextView
+        android:id="@+id/details_access_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/access" />
+      <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:id="@+id/rg_access"
+        android:checkedButton="@+id/details_r_public">
+        <RadioButton
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/details_r_public"
+          android:text="@string/xpublic" />
+        <RadioButton
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/details_r_private"
+          android:text="@string/xprivate" />
+        <RadioButton
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/details_r_confidential"
+          android:text="@string/confidential" />
+      </RadioGroup>
+
+    <View
+    android:layout_width="wrap_content"
+    android:layout_height="1dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/line_separator" />
+<!-- Priority -->
+
+      <TextView
+        android:id="@+id/details_priority_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/priority" />
+      <TextView
+        android:id="@+id/priority_value_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hodnota" />
+      <SeekBar
+        android:id="@+id/priority_sb"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="26dp"
+        android:max="10"/>
+
+    <View
+    android:layout_width="wrap_content"
+    android:layout_height="1dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/line_separator" />
+<!-- Date -->
+
+      <TextView
+        android:id="@+id/date_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/date" />
+      <TextView
+        android:id="@+id/details_start_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0/0/0" />
+      <Button
+        android:id="@+id/details_start_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/set_date"></Button>
+      <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:id="@+id/date_rg"
+        android:checkedButton="@+id/details_r_allday">
+        <RadioButton
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/details_r_allday"
+          android:text="@string/allday" />
+        <RadioButton
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:id="@+id/details_r_timed"
+          android:text="@string/timed" />
+      </RadioGroup>
+
+    <View
+    android:layout_width="wrap_content"
+    android:layout_height="1dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/line_separator" />
+<!-- Time -->
+
+      <TextView
+        android:id="@+id/time_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time"/>
+      <TextView
+        android:id="@+id/details_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00" />
+      <Button
+        android:id="@+id/details_time_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/set_time">
+      </Button>
+
+    <View
+    android:layout_width="wrap_content"
+    android:layout_height="1dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/line_separator" />
+<!-- Duration -->
+
+      <TextView
+        android:id="@+id/details_duration_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/duration" />
+      <LinearLayout
+        android:id="@+id/widget32"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal" xmlns:android="http://schemas.android.com/apk/res/android">
+        <EditText
+          android:id="@+id/dur_h_et"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="00"
+          android:inputType="numberDecimal"
+          android:textSize="18sp" />
+        <TextView
+          android:id="@+id/details_duration_tv"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text=":" />
+        <EditText
+          android:id="@+id/dur_m_et"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:inputType="numberDecimal"
+          android:text="00"
+          android:textSize="18sp" />
+      </LinearLayout>
+    </LinearLayout>
+  </ScrollView>
+</RelativeLayout>

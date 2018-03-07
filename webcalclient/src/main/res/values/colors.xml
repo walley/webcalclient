@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="white">#FFFFFF</color>
+  <color name="black">#000000</color>
+  <color name="green">#00ff00</color>
+  <color name="blue">#0000ff</color>
+  <color name="red">#ff0000</color>
+  <color name="symptom_color_selected">#003366</color>
+  <color name="reaction_color_selected">#003366</color>
+  <color name="static_text_color">#003366</color>
+  <color name="journal_entry_listitem_text_color">#003366</color>
+  <color name="note_text_disabled">#333333</color>
+</resources>

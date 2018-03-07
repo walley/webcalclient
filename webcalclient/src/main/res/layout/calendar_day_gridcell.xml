@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="wrap_content"
+  android:layout_height="fill_parent"
+  android:clickable="true"
+  android:id="@+id/ll_gridcell"
+  android:background="@drawable/calendar_button_selector"
+  android:layout_gravity="fill"
+  >
+
+  <TextView
+    android:id="@+id/day_number"
+    android:textSize="8sp"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:text="0"
+    android:textColor="#0a0a0a"
+  />
+</LinearLayout>

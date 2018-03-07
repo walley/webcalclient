@@ -1,0 +1,105 @@
+<script>
+function get_events(u, d, m, y)
+{
+  var i;
+  var ret = "<table>";
+
+  for (i in events) {
+    var x = events[i];
+    if (x["day"] === d && x["user"] === u && x["month"] === m && x["year"] === y) {
+      ret += "<tr><td><span onclick='Android.show_event(" + x["id"] + ");'>" + x["hour"] + "»" + x["event"] + "</span></td></tr>";
+    }
+  }
+  ret += "</table>";
+
+  return ret;
+}
+
+function get_monday(dd)
+{
+  var d = new Date(dd);
+
+  if (d.getDay() == 0) {
+    //monday is first day of the week so we need week before
+    d.setDate(d.getDate() - 1);
+  }
+
+  //  document.write(d.toString()+" "+d.getDate()+" "+d.getDay());
+  //document.write((d.getDate() - d.getDay() + 1) + ".");
+
+  var year = 0;
+  if (d.getMonth() == 0 && (d.getDate() - d.getDay() + 2) < 0) {
+    year = d.getFullYear() - 1;
+  } else {
+    year = d.getFullYear()
+  }
+
+  return new Date(year, d.getMonth(), d.getDate() - d.getDay() + 1);
+}
+
+function getLastDayOfMonth(d)
+{
+  return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+}
+
+function display_calendar(year, month, day)
+{
+  month--;
+
+  var html_content = "";
+  var FebNumberOfDays = "";
+
+  var date_now = new Date(year, month, day);
+
+  var month = date_now.getMonth();
+  var day = date_now.getDate();
+  var year = date_now.getFullYear();
+
+  month++;
+
+  // names of months and week days.
+  var enmonthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var endayNames = ["Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday", "Sunday"];
+
+  var monthNames = ["leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec"];
+  var dayNames = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"];
+
+  var options = {
+    weekday : 'long',
+    year : 'numeric',
+    month : 'long',
+    day : 'numeric',
+    timeZoneName : 'long'
+  };
+  html_content += "<h1>" + date_now.toLocaleDateString("cs-CZ", options) + "</h1>";
+
+  var monday = get_monday(date_now);
+
+  html_content += "<table class='t'>";
+  //draw users
+  html_content += "<td>Den v týdnu</td><td>Den</td>";
+
+  for ( iu = 0; iu < users.length; iu++) {
+    html_content += "<th>" + users[iu] + user_names[iu] + "</th>";
+  }
+
+  html_content += "<tr>";
+
+  var d = monday;
+  var day;
+  for ( i = 0; i < 7; i++) {
+    day = d.getDate()
+    html_content += "<tr>";
+    html_content += "<td class='hi'>" + dayNames[i] + "</td>";
+    html_content += "<td class='hi'>" + day + "</td>";
+
+    for ( iu = 0; iu < users.length; ++iu) {
+      html_content += "<td class='lo'>" + get_events(users[iu], day, month, year) + "</td>";
+    }
+    d.setDate(d.getDate() + 1);
+    html_content += "</tr>";
+  }
+
+  document.getElementById("calendar").innerHTML = html_content;
+}
+</script>

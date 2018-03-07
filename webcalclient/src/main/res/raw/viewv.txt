@@ -1,0 +1,112 @@
+ <script>
+ function get_events(u, d)
+ {
+   var i;
+   var ret = "<table>";
+   for (i in events) {
+     var x = events[i];
+     if (x["day"] === d && x["user"] === u) {
+       ret += "<tr><td><span onclick='Android.show_event(" + x["id"] + ");'>" + x["hour"]+":"+ x["minute"] +"» " + x["event"] + "</span></td></tr>";
+     }
+   }
+   ret += "</table>";
+   return ret;
+ }
+ function get_monday(dd)
+ {
+   var d = new Date(dd);
+   if (d.getDay() == 0) {
+     //monday is first day of the week so we need week before
+     d.setDate(d.getDate() - 1);
+   }
+   //  document.write(d.toString()+" "+d.getDate()+" "+d.getDay());
+   //document.write((d.getDate() - d.getDay() + 1) + ".");
+   var year = 0;
+   if (d.getMonth() == 0 && (d.getDate() - d.getDay() + 2) < 0) {
+     year = d.getFullYear() - 1;
+   } else {
+     year = d.getFullYear()
+   }
+   return new Date(year, d.getMonth(), d.getDate() - d.getDay() + 1);
+ }
+
+ function getMonday(d)
+ {
+   return new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay() + 1);
+ }
+ function getSunday(d)
+ {
+   return new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay() + 7);
+ }
+ function getLastDayOfMonth(d)
+ {
+   return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+ }
+ function display_calendar(year, month, day)
+ {
+   month--;
+   var html_content = "";
+   var FebNumberOfDays = "";
+   var date_now = new Date(year, month, day);
+   var month = date_now.getMonth();
+   var current_month = month + 1;
+   var prevMonth = month - 1;
+   var day = date_now.getDate();
+   var year = date_now.getFullYear();
+   // names of months and week days.
+   var enmonthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+   var endayNames = ["Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday", "Neděle"];
+   var monthNames = ["leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec"];
+   var dayNames = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"];
+   var monday = get_monday(date_now);
+   var this_monday = getMonday(date_now).getDate();
+   var this_sunday = getSunday(date_now).getDate();
+  
+   var options = {
+     weekday : 'long',
+     year : 'numeric',
+     month : 'long',
+     day : 'numeric',
+     timeZoneName : 'short'
+   };
+   html_content += "<h1>" + date_now.toLocaleDateString("cs-CZ", options) + "</h1>";
+   html_content += "<table class='t'>";
+   
+   //draw users
+   var d;
+   d = get_monday(date_now);
+   html_content += "<tr><td>&nbsp;</td>";
+   for ( id = 0; id < 7; id++) {
+     day = d.getDate()
+     html_content += "<th>" + day + "</th>";
+     d.setDate(d.getDate() + 1)
+   }
+   html_content += "</tr>";
+
+   d = get_monday(date_now);
+   html_content += "<tr><td>&nbsp;</td>";
+   for ( id = 0; id < 7; id++) {
+     day = d.getDate()
+     html_content += "<th class='hi'>" + dayNames[id] + "</th>";
+     d.setDate(d.getDate() + 1)
+   }
+   html_content += "</tr>";
+
+   d = monday;
+   html_content += "<tr>";
+   var day;
+   for ( i = 0; i < users.length; i++) {
+     html_content += "<tr>";
+     html_content += "<td class='hi'>" + users[i] + "</td>";
+
+     d = get_monday(date_now);
+     for ( iu = 0; iu < 7; ++iu) {
+       day = d.getDate()
+       html_content += "<td class='lo' width='13%''>" + get_events(users[i], day) + "</td>";
+       d.setDate(d.getDate() + 1);
+     }
+     html_content += "</tr>";
+   }
+   document.getElementById("calendar").innerHTML = html_content;
+ }
+ </script>

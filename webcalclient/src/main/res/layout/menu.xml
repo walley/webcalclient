@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+  >
+
+  <TextView
+    android:id="@+id/version"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="version"
+  />
+
+  <Button 
+    android:id="@+id/b_calendar"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:text="@string/calendar"
+  />
+  <Button 
+    android:id="@+id/b_views"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:text="@string/views"
+  />
+  <Button 
+    android:id="@+id/b_users"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:text="@string/users"
+  />
+  <Button 
+    android:id="@+id/b_preferences"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:text="@string/preferences"
+  />
+  <Button 
+    android:id="@+id/b_sync"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:text="@string/sync"
+  />
+  <Button 
+    android:id="@+id/b_sql"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:text="sql"
+  />
+
+</LinearLayout>

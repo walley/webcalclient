@@ -1,0 +1,3 @@
+<script>
+  document.write("error, unknown view type");
+</script>

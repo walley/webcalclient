@@ -1,0 +1,128 @@
+<script>
+function get_events(d, m, y)
+{
+  var i;
+  var ret = "";
+
+events.sort(function(a, b){
+    if(a.hour < b.hour) return -1;
+    if(a.hour > b.hour) return 1;
+    return 0;
+})
+
+  for (i in events) {
+    var x = events[i];
+    if ((x["day"] === d && x["month"] === m && x["year"] === y) || x["repeat"] === "forever") {
+      ret += "<tr><td colspan=2>";
+      ret += "<span class='event' onclick='Android.show_event(" + x["id"] + ");'>";
+      ret += x["hour"] + "»" + x["user_name"] + " " + x["event"];
+      ret += "</span>";
+      ret += "</td></tr>";
+    }
+  }
+  return ret;
+}
+
+function display_calendar(year, month)
+{
+
+  month--;
+
+  var cal_body = "";
+
+  var html_content = "";
+  var FebNumberOfDays = "";
+  var counter = 1;
+  // var date_now = new Date();
+  var date_now = new Date(year, month, 1);
+  var today = new Date();
+  var month = date_now.getMonth();
+  var nextMonth = month + 1;
+  //Used to match up the current month with the correct start date.
+  var prevMonth = month - 1;
+  var day = date_now.getDate();
+  var year = date_now.getFullYear();
+
+  //Determing if February (28,or 29)
+  if (month == 1) {
+    if ((year % 100 != 0) && (year % 4 == 0) || (year % 400 == 0)) {
+      FebNumberOfDays = 29;
+    } else {
+      FebNumberOfDays = 28;
+    }
+  }
+
+  var enmonthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var endayNames = ["Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday", "Sunday"];
+
+  var monthNames = ["leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec"];
+  var dayNames = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"];
+  var dayPerMonth = ["31", "" + FebNumberOfDays + "", "31", "30", "31", "30", "31", "31", "30", "31", "30", "31"];
+
+  // days in previous month and next one , and day of week.
+  var nextDate = new Date(nextMonth + ' 1 ,' + year);
+  var weekdays = nextDate.getDay();
+  var weekdays2 = weekdays
+  var numOfDays = dayPerMonth[month];
+  // this leave a white space for days of pervious month.
+
+    var options = {
+      year : 'numeric',
+      month : 'long',
+      timeZoneName : 'long'
+    };
+    cal_body += "<h1>" + date_now.toLocaleDateString("cs-CZ", options) + "</h1>";
+
+  while (weekdays > 1) {
+    html_content += "<td>&nbsp;</td>";
+    // used in next loop.
+    weekdays--;
+  }
+
+  // loop to build the calander body.
+  while (counter <= numOfDays) {
+    // When to start new line.
+    if (weekdays2 > 7) {
+      weekdays2 = 1;
+      html_content += "</tr><tr>";
+    }
+
+    // if counter is current day.
+    // highlight current day using the CSS defined in header.
+
+    td_start_now = "<td class='now'>";
+    td_start = "<td class='lo'>";
+
+    if (counter == today.getDate()) {
+      html_content += td_start_now;
+    } else {
+      html_content += td_start;
+    }
+
+    html_content += "<table width='100%'>";
+    html_content += "<tr><td width='20%' class='lo'>" + counter + "</td><td width='80%'>&nbsp;</td></tr>";
+    html_content += get_events(counter, month + 1, year);
+    html_content += "</table>";
+    html_content += "</td>";
+
+    weekdays2++;
+    counter++;
+  }
+
+  day_row_str = "<tr class='dayNames'>";
+  for ( i = 0; i < 7; i++) {
+    day_row_str += "<th class='hi' width='14%'>" + dayNames[i] + "</th>";
+  }
+  day_row_str += "</tr>";
+
+  // building the calendar html body.
+  cal_body += "<table id='calendar' class='t'>";
+  cal_body += "<tr class='monthNow'><th colspan='7'>" + monthNames[month] + " " + year + "</th></tr>";
+  cal_body += day_row_str;
+  cal_body += "<tr>";
+  cal_body += html_content;
+  cal_body += "</tr></table>";
+
+  document.getElementById("calendar").innerHTML = cal_body;
+}
+</script>
