@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="remember">remember</string>
+  <string name="location">Location:</string>
+  <string name="author">Author:</string>
+  <string name="cancel">Cancel</string>
+  <string name="send">Send</string>
+<string name="gpl">Guidepost  Copyright (C) 2013  Michal Grezl \n
+This program comes with ABSOLUTELY NO WARRANTY; for details see license.\n
+This is free software, and you are welcome to redistribute it under certain conditions; see license for details.
+\n
+http://www.gnu.org/licenses/gpl.txt
+</string>
+  <string name="exit">Exit</string>
+  <string name="about">How to use:\nTo use this application, 
+you must use share with ... function from other apps such as camera.
+</string>
+  <string name="bye">Bye</string>
+  <string name="tryagain">Try again</string>
+  <string name="uploadfailed">Upload failed</string>
+
+
+  <string name="app_name">webcalclient</string>
+  <string name="settings_password">Your super secret password</string>
+  <string name="settings_username">Your Username</string>
+  <string name="settings_url">Server URL http://x.org</string>
+  <string name="app_password">Webcalendar Password</string>
+  <string name="app_username">WebCalendar Username</string>
+  <string name="http_password">Intranet Password</string>
+  <string name="http_username">Intranet Username</string>
+  <string name="url">Webcalendar url</string>
+  <string name="users">Users</string>
+  <string name="pleasewait">Please wait ...</string>
+  <string name="connection_refused">Connection refused</string>
+  <string name="preferences">Preferences</string>
+  <string name="sync">Synchronize</string>
+  <string name="calendar">Calendar</string>
+  <string name="views">Views</string>
+  <string name="details">Details</string>
+  <string name="reminders">Reminders</string>
+  <string name="repeat">Repeat</string>
+  <string name="participants">Participants</string>
+  <string name="selected_participants">Selected participants</string>
+  <string name="externals">External participants</string>
+  <string name="confidential">Confidential</string>
+  <string name="xpublic">Public</string>
+  <string name="xprivate">Private</string>
+  <string name="allday">All day</string>
+  <string name="timed">Timed</string>
+  <string name="monthstosync">Time period to sync</string>
+  <string name="monthstosync_desc">How many months to sync</string>
+  <string name="syncing">Synchronizing</string>
+
+  <string name="editevent_save">Save</string>
+  <string name="editevent_settings">Settings</string>
+
+  <string name="none">None</string>
+  <string name="daily">Daily</string>
+  <string name="weekly">Weekly</string>
+  <string name="monthlyByDay">Monthly (by day)</string>
+  <string name="monthlyByDate">Monthly (by date)</string>
+  <string name="monthlyBySetPos">Monthly (by position)</string>
+  <string name="yearly">Yearly</string>
+  <string name="manual">Manual</string>
+
+  <string name="calendar_add">Add new event...</string>
+  <string name="event_saved">Event saved...</string>
+  <string name="wrong_password">Wrong username or pasword</string>
+  <string name="brief_desc">Brief description:</string>
+  <string name="full_desc">Full description:</string>
+  <string name="brief_title">Brief</string>
+  <string name="full_title">Long description</string>
+  <string name="duration">Duration:</string>
+  <string name="time">Time:</string>
+  <string name="set_date">Set date</string>
+  <string name="date">Date:</string>
+  <string name="access">Access:</string>
+  <string name="priority">Priority:</string>
+  <string name="set_time">Set time</string>
+
+  <string name="workhoursfrom_desc">What time do you start working at</string>
+  <string name="workhoursto_desc">What time do you end working at</string>
+  <string name="workhoursfrom">Work hours start</string>
+  <string name="workhoursto">Work hours end</string>
+  <string name="no_inet">No network connection</string>
+
+<string-array name="repeat_array">
+<item>@string/none</item>
+<item>@string/daily</item>
+<item>@string/weekly</item>
+<item>@string/monthlyByDay</item>
+<item>@string/monthlyByDate</item>
+<item>@string/monthlyBySetPos</item>
+<item>@string/yearly</item>
+<item>@string/manual</item>
+</string-array>
+
+  <string name="repeat_type">Type</string>
+  <string name="repeat_ending">Ending</string>
+  <string name="repeat_frequency">Frequency</string>
+  <string name="weekdays_only">Weekdays Only</string>
+  <string name="select_from_spinner">Select fdrom spinner above</string>
+  <string name="not_implemented">Not implemented, missing API</string>
+
+  <string name="number_of_times">Number of times</string>
+  <string name="use_end_date">Use end date</string>
+  <string name="forever">Forever</string>
+  <string name="repeat_not_implemented">Repeat frequency not supported yet, cannot save</string>
+  <string name="create_new_event">New event created</string>
+
+  <string name="hour">Hour</string>
+  <string name="event">Event</string>
+  <string name="all_day">All day</string>
+
+  <string name="users_calendars">Users\' calendars</string>
+  <string name="tables">SQL Tables</string>
+  <string name="my_calendar">My calendar</string>
+  <string name="users_list">List of available users</string>
+  <string name="views_list">List of available views</string>
+  <string name="sync_done">Synchronization process has finished</string>
+  <string name="sync_error">Synchronization process aborted because of errors</string>
+
+
+<!-- HTML -->
+
+<string name="html_head"><![CDATA[
+<!DOCTYPE html>
+<html>
+<head> 
+<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">
+<title>x</title>
+\n
+<style>
+
+.t {
+  vertical-align:top;
+  border: 1px solid red;
+  border-collapse: collapse;
+}
+
+.hi {
+  border:1px solid #F00000;
+  background-color: #C0F0C0;
+  padding: 1px;
+}
+
+.lo {
+  border:1px solid #F00000;
+  background-color: #F0F0C0;
+  vertical-align:top;
+  padding: 1px;
+}
+
+.now {
+  border:1px solid #F00000;
+  background-color: #F0F030;
+  vertical-align:top;
+  padding: 1px;
+}
+
+th {
+  border:1px solid #F00000;
+  background:#C0F0C0;
+  color:#000000;
+  padding: 1px;
+}
+
+.monthPre {
+ color: gray;
+ text-align: center;
+}
+.monthNow {
+ color: blue;
+ text-align: center;
+}
+.dayNow {
+ border: 2px solid black;
+ color: #FF0000;
+ text-align: left;
+}
+
+.monthNow th {
+ background-color: #000000;
+ color: #FFFFFF;
+ text-align: center;
+}
+.dayNames {
+ background: #0FF000;
+ color: #FFFFFF;
+ text-align: center;
+}
+
+.event {color: green;}
+
+</style>
+\n
+]]></string>
+
+<string name="html_between"><![CDATA[
+</head>\n
+<body>
+]]></string>
+
+<string name="html_body"><![CDATA[
+<hr>
+<div id=\"calendar\"></div>
+<hr>
+]]></string>
+
+<string name="html_end"><![CDATA[
+</body>\n
+</html>
+]]></string>
+
+</resources>
