@@ -63,6 +63,9 @@ public class wcc_activity extends Activity
   String app_username;
   String app_password;
 
+  String class_prefix = "wcc_activity-";
+  String func_prefix = "func_prefix";
+
   /******************************************************************************/
   public boolean isOnline()
   /******************************************************************************/
@@ -256,6 +259,7 @@ public class wcc_activity extends Activity
     HttpEntity entity;
     int ret = 1;
     String err = "nothing";
+    String func_prefix = class_prefix + "login_and_get_cookie():";
 
     try {
 
@@ -274,14 +278,14 @@ public class wcc_activity extends Activity
       entity = response.getEntity();
 
       StatusLine status = response.getStatusLine();
-      Log.d("WC","login_and_get_cookie() - login form get: " + status);
+      Log.i("WC",func_prefix + "get webcalendar loginform: " + status);
 
       if (status.getStatusCode() != 200) {
-        Log.e("WC","login_and_get_cookie() - login error: " + status.toString());
+        Log.e("WC",func_prefix + "login error: " + status.toString());
         throw new LoginException(status.toString());
       }
 
-      Log.d("WC","login_and_get_cookie() - login ok: " + status);
+      Log.i("WC",func_prefix + "login ok: " + status);
 
       InputStream inputStream = entity.getContent();
       ByteArrayOutputStream content = new ByteArrayOutputStream();
@@ -304,9 +308,9 @@ public class wcc_activity extends Activity
 
       if (matcher.find()) {
         err = matcher.group(1);
-        Log.d("WC","login_and_get_cookie(): error found: " + err);
+        Log.e("WC",func_prefix + "result from form: error found: " + err);
       } else {
-        Log.d("WC","login_and_get_cookie(): logged in! ");
+        Log.i("WC",func_prefix + "logged in! ");
         err = "(OK)";
       }
 
@@ -315,11 +319,11 @@ public class wcc_activity extends Activity
       entity_consume_content(entity);
 
     } catch (HttpHostConnectException e) {
-      Log.e("WC","login_and_get_cookie() - connection refused: " + e.toString());
+      Log.e("WC",func_prefix + "connection refused: " + e.toString());
       ret = 0;
 //      Toast.makeText(this, getResources().getString(R.string.connection_refused), Toast.LENGTH_LONG).show();
     } catch (Exception e) {
-      Log.e("WC","login_and_get_cookie() - general error" + e.toString());
+      Log.e("WC",func_prefix + "general error" + e.toString());
       ret = 0;
     }
 
