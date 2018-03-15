@@ -282,11 +282,9 @@ public class wcc_sync extends wcc_activity
       case "error_views":
         cb_views.setChecked(true);
         cb_views.setEnabled(false);
-        result_views = "ok";
       break;
       case "done_views":
         cb_views.setChecked(true);
-        result_views = "ok";
         break;
       case "parsed_view":
         pb_views.incrementProgressBy(1);
@@ -1682,50 +1680,66 @@ public class wcc_sync extends wcc_activity
     private ProgressDialog dialog;
     private String login_result;
     SQLiteDatabase db = null;
+    private String str_result = "x";
+    HttpResponse response = null;
 
     String class_prefix = "wcc_sync.obtain_list_of_views-";
     String func_prefix = "func_prefix";
 
     /******************************************************************************/
-    void insert_into_views(String name, String url, String typ, String id, String users)
+    private void fetch_data(String server_url)
     /******************************************************************************/
     {
-      String query  = "insert into views values (null,";
-      query += android.database.DatabaseUtils.sqlEscapeString(name);
-      query += ",";
-      query += android.database.DatabaseUtils.sqlEscapeString(url);
-      query += ",";
-      query += android.database.DatabaseUtils.sqlEscapeString(typ);
-      query += ",";
-      query += android.database.DatabaseUtils.sqlEscapeString(users);
-      query += ",";
-      query += android.database.DatabaseUtils.sqlEscapeString(id);
-      query += ")";
+      String func_prefix = class_prefix + "fetch_data():";
+      HttpEntity entity = null;
 
-      Log.i("WC","views: insert_into_views():" + query);
-      mydb.execSQL(query);
+      show_cookies(httpclient);
 
+      try {
+        HttpGet httpget = new HttpGet(server_url);
+        httpget.setHeader("Authorization", "Basic " + get_credentials());
+        response = httpclient.execute(httpget);
+        entity = response.getEntity();
+
+        InputStream is = entity.getContent();
+        str_result = IOUtils.toString(is);
+
+        Log.i("WC",func_prefix + "response statusline:" + response.getStatusLine());
+        Log.i("WC",func_prefix + "response string    :" + str_result);
+      } catch (SSLPeerUnverifiedException e) {
+        //something bad with connection (wifi login dialog) fixme
+        login_result = e.toString();
+        Log.e("WC",func_prefix + "SSLPeerUnverifiedException: " + e.toString());
+      } catch (IllegalStateException e) {
+        login_result = e.toString();
+        Log.e("WC",func_prefix + "IllegalStateException: " + e.toString());
+      } catch (Exception e) {
+        Log.e("WC",func_prefix + "Exception: " + e.toString());
+        login_result = e.toString();
+      } finally {
+        entity_consume_content(entity);
+      }
     }
 
     /******************************************************************************/
-    public ArrayList<String> get_views()
+    public ArrayList<String> get_views() throws LoginException, ApiException
     /******************************************************************************/
     {
       String func_prefix = class_prefix + "get_views():";
 
-      HttpResponse response = null;
       HttpEntity entity = null;
-      DefaultHttpClient httpclient = new DefaultHttpClient();
 
-      String str_result = null;
       ArrayList<String> list = new ArrayList<String>();
 
       set_credentials();
-      String server_url = get_server_url();
+      Log.i("WC",func_prefix + " ****** START ******");
+
+      String server_url = get_server_url() + "mobile_views.php";
+      Log.i("WC",func_prefix + "url: " + server_url);
 
       Log.i("WC",func_prefix + "*** Step 1.");
-      try {
-        HttpGet httpget = new HttpGet(server_url + "mobile_views.php");
+/*      try {
+        HttpGet httpget = new HttpGet(server_url);
         httpget.setHeader("Authorization", "Basic " + get_credentials());
         response = httpclient.execute(httpget);
         entity = response.getEntity();
@@ -1747,57 +1761,45 @@ public class wcc_sync extends wcc_activity
         entity_consume_content(entity);
         return null;
       }
+*/
+      fetch_data(server_url);
 
       Log.i("WC",func_prefix + "*** Step 2.");
-
-      EventBus.getDefault().post(new MessageEvent("Hello everyone!"));
 
       int code = response.getStatusLine().getStatusCode();
 
       if (code == 401) {
         //401 Unauthorized
         Log.i("WC",func_prefix + " 401, not logged in, no or bad intranet password");
-        //prolly bad intranet pwd, return empty list FIXME WAY TO RETURN ERRORS
         login_result = "401, not logged in, no or bad intranet password";
-        if (entity != null) {
-          try {
-            entity.consumeContent();
-          } catch (IOException e) {
-            Log.e("WC","error " + e.toString());
-          }
-        }
+        //prolly bad intranet pwd
         show_cookies(httpclient);
-        return list;
+        throw new LoginException("Bad internet login.");
 
       } else if (code == 200) {
         //200 OK
+        Log.i("WC",func_prefix + " 200, OK");
         login_result = "ok";
 
-        String str = null;
-        try {
-          InputStream is = entity.getContent();
-          str = IOUtils.toString(is);
-        } catch (IOException e) {
-          Log.e("WC",func_prefix + "error " + e.toString());
-        }
-
-        entity_consume_content(entity);
-
-        if (str.contains("error check login")) {
+        if (str_result.contains("error check login")) {
           Log.i("WC",func_prefix + " we need to login ");
           try {
             login_and_get_cookie(httpclient);
           } catch (LoginException e) {
             String estr =  e.toString();
-            Log.i("WC",func_prefix + " 200, logged in" + estr);
+            Log.i("WC",func_prefix + " 200, logging error" + estr);
             login_result = estr;
           }
-        }
+          fetch_data(server_url);
 
+        } else {
+          Log.i("WC",func_prefix + " logged in");
+        }
         show_cookies(httpclient);
       }
 
-      try {
+
+/*      try {
         Log.i("WC",func_prefix + "*** Step 3.");
 
         HttpPost httpost2 = new HttpPost(get_server_url() + "mobile_views.php");
@@ -1828,7 +1830,7 @@ public class wcc_sync extends wcc_activity
         Log.e("WC",func_prefix + "step 3. error " + e.toString());
         return null;
       }
-
+*/
       try {
 
         JSONArray arr = new JSONArray(str_result.trim());
@@ -1872,7 +1874,7 @@ public class wcc_sync extends wcc_activity
     {
       dialog = new ProgressDialog(context);
       dialog = ProgressDialog.show(context, getResources().getString(R.string.syncing), getResources().getString(R.string.pleasewait));
-      sync_tv.append("ctu pohledy ...\n");
+      sync_tv.append("Ctu pohledy ...\n");
       db = open_db();
     }
 
@@ -1880,12 +1882,29 @@ public class wcc_sync extends wcc_activity
     protected ArrayList<String> doInBackground(String... connection)
     /******************************************************************************/
     {
-      String func_prefix = class_prefix + "doInBackground:";
+      String func_prefix = class_prefix + "doInBackground():";
 
-      temparrlist = get_views();
+      try {
+        temparrlist = get_views();
+      } catch (LoginException e) {
+        Log.i("WC", func_prefix + "bad pw " + e.toString());
+        login_result = e.toString();
+        result_views = "error (" + login_result + ")";
+        return null;
+      } catch (ApiException e) {
+        Log.i("WC", func_prefix + "wrong api call " + e.toString());
+        login_result = "bad url";
+        result_views = "error (" + login_result + ")";
+        return null;
+      } catch (Exception e) {
+        Log.i("WC", func_prefix + "error" + e.toString());
+        login_result = "error";
+        result_views = "error (" + login_result + ")";
+        return null;
+      }
 
       if (temparrlist == null) {
-        Log.e("WC",func_prefix + "doInBackground(): returned null list");
+        Log.e("WC",func_prefix + "returned null list");
         global_error = true;
         result_views = "error (" + login_result + ")";
         EventBus.getDefault().post(new MessageEvent("error_views"));
@@ -1893,10 +1912,12 @@ public class wcc_sync extends wcc_activity
       }
 
       if (temparrlist.size() == 0) {
-        Log.e("WC",func_prefix + "doInBackground(): returned empty list");
+        Log.e("WC",func_prefix + "returned empty list");
       }
 
-      EventBus.getDefault().post(new MessageEvent("done_views"));
+//      EventBus.getDefault().post(new MessageEvent("done_views"));
+
+      result_views = "ok";
 
       return temparrlist;
     }
@@ -1906,9 +1927,36 @@ public class wcc_sync extends wcc_activity
     /******************************************************************************/
     {
       dialog.dismiss();
-      Log.i("WC",class_prefix + "onPostExecute: views final result" + login_result);
-      sync_tv.append("pohledy precteny ... \n");
+      Log.i("WC",class_prefix + "onPostExecute: views final result: " + login_result);
+      sync_tv.append("Pohledy precteny ... \n");
       close_db(db);
+
+      if (result_views.equals("ok")) {
+        EventBus.getDefault().post(new MessageEvent("done_views"));
+      } else {
+        EventBus.getDefault().post(new MessageEvent("error_views"));
+      }
+    }
+
+    /******************************************************************************/
+    void insert_into_views(String name, String url, String typ, String id, String users)
+    /******************************************************************************/
+    {
+      String query  = "insert into views values (null,";
+      query += android.database.DatabaseUtils.sqlEscapeString(name);
+      query += ",";
+      query += android.database.DatabaseUtils.sqlEscapeString(url);
+      query += ",";
+      query += android.database.DatabaseUtils.sqlEscapeString(typ);
+      query += ",";
+      query += android.database.DatabaseUtils.sqlEscapeString(users);
+      query += ",";
+      query += android.database.DatabaseUtils.sqlEscapeString(id);
+      query += ")";
+
+      Log.i("WC","views: insert_into_views():" + query);
+      mydb.execSQL(query);
+
     }
   }
 
