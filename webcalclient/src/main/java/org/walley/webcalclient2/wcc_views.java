@@ -122,9 +122,10 @@ public class wcc_views extends wcc_activity
     mydb = open_db();
     String desc;
     String id;
+    Cursor query_result;
 
     try {
-      Cursor query_result  = mydb.rawQuery(query, null);
+      query_result  = mydb.rawQuery(query, null);
 
       if(query_result.moveToFirst()) {
 
@@ -132,7 +133,6 @@ public class wcc_views extends wcc_activity
           desc = query_result.getString(1);
           id = query_result.getString(5);
           hash.put(desc, id);
-          Log.d("WC","wcc_views get_views " );
           Log.d("WC","wcc_views get_views " + desc + " " + id);
         } while(query_result.moveToNext());
 
@@ -140,6 +140,10 @@ public class wcc_views extends wcc_activity
     } catch(Exception e) {
       Log.d("WC","wcc_views get_views " + e.toString());
       e.printStackTrace();
+    } finally {
+      if(query_result != null){
+        query_result.close();
+      }
     }
 
     myadapter = new MyAdapter(hash);
