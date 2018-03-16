@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -67,9 +68,10 @@ public class wcc_views extends wcc_activity
   SharedPreferences prefs;
   String login;
   HashMap<String, String> hash = new HashMap<String, String>();
-
   HashMap<String, String> hashMap = new HashMap<String, String>();
   ArrayList<HashMap<String, String>> ulist;
+
+  String class_name = this.getClass().getSimpleName();
 
   /******************************************************************************/
   public void create_ui()
@@ -88,7 +90,7 @@ public class wcc_views extends wcc_activity
         i.setClass(wcc_views.this,wcc_webview.class);
         i.putExtra("view_id", view_id);
 
-        Log.d("WC","wcc_views onitemclick: view id " + view_id);
+        Log.d("WC",class_name + "onitemclick: view id " + view_id);
 
         startActivity(i);
       }
@@ -122,7 +124,7 @@ public class wcc_views extends wcc_activity
     mydb = open_db();
     String desc;
     String id;
-    Cursor query_result;
+    Cursor query_result = null;
 
     try {
       query_result  = mydb.rawQuery(query, null);
@@ -133,12 +135,12 @@ public class wcc_views extends wcc_activity
           desc = query_result.getString(1);
           id = query_result.getString(5);
           hash.put(desc, id);
-          Log.d("WC","wcc_views get_views " + desc + " " + id);
+          Log.d("WC",class_name + "get_views " + desc + " " + id);
         } while(query_result.moveToNext());
 
       }
     } catch(Exception e) {
-      Log.d("WC","wcc_views get_views " + e.toString());
+      Log.d("WC",class_name + "get_views error:" + e.toString());
       e.printStackTrace();
     } finally {
       if(query_result != null){
@@ -194,16 +196,21 @@ public class wcc_views extends wcc_activity
       final View result;
 
       if (convertView == null) {
-        result = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_adapter, parent, false);
+        result = LayoutInflater.from(parent.getContext()).inflate(R.layout.views_adapter, parent, false);
       } else {
         result = convertView;
       }
 
       Map.Entry<String, String> item = getItem(position);
 
-      // TODO replace findViewById by ViewHolder
       ((TextView) result.findViewById(android.R.id.text1)).setText(item.getKey());
       ((TextView) result.findViewById(android.R.id.text2)).setText(item.getValue());
+
+      if (position % 2 == 1) {
+        result.setBackgroundColor(Color.BLUE);
+      } else {
+        result.setBackgroundColor(Color.CYAN);
+      }
 
       return result;
     }
