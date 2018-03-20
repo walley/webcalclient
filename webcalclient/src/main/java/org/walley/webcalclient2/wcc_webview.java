@@ -3,7 +3,6 @@ package org.walley.webcalclient2;
 import java.util.TimeZone;
 import java.util.Calendar;
 import java.util.Locale;
-import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -21,10 +20,6 @@ import android.text.TextUtils;
 import android.content.Intent;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-//import android.os.Build;
-//import android.app.Application;
-//import android.content.pm.ApplicationInfo;
 
 /******************************************************************************/
 /******************************************************************************/
