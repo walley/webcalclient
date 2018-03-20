@@ -1678,7 +1678,7 @@ public class wcc_sync extends wcc_activity
   {
     ArrayList<String> temparrlist = new ArrayList<String>();
     private ProgressDialog dialog;
-    private String login_result;
+    private String login_result = "ok";
     SQLiteDatabase db = null;
     private String str_result = "x";
     HttpResponse response = null;
@@ -1734,6 +1734,8 @@ public class wcc_sync extends wcc_activity
       set_credentials();
       Log.i("WC",func_prefix + " ****** START ******");
 
+      //check_server_url(get_server_url());
+
       String server_url = get_server_url() + "mobile_views.php";
       Log.i("WC",func_prefix + "url: " + server_url);
 
@@ -1763,6 +1765,9 @@ public class wcc_sync extends wcc_activity
       }
 */
       fetch_data(server_url);
+      if (!login_result.equals("ok")) {
+        throw new LoginException(login_result);
+      }
 
       Log.i("WC",func_prefix + "*** Step 2.");
 
@@ -1791,6 +1796,9 @@ public class wcc_sync extends wcc_activity
             login_result = estr;
           }
           fetch_data(server_url);
+          if (!login_result.equals("ok")) {
+            throw new LoginException(login_result);
+          }
 
         } else {
           Log.i("WC",func_prefix + " logged in");
@@ -1839,18 +1847,19 @@ public class wcc_sync extends wcc_activity
         EventBus.getDefault().post(new MessageEvent("set_view", number_of_views));
 
         for (int i = 0; i < arr.length(); i++) {
-          JSONObject users = arr.getJSONObject(i); //should be views and not users:)
-          String name   = users.getString("name");
-          String url    = users.optString("url");
-          String type   = users.optString("type");
-          String vusers = users.optString("users");
-          String id     = users.optString("id");
+          JSONObject views;
+          views = arr.getJSONObject(i);
+          String name   = views.getString("name");
+          String url    = views.optString("url");
+          String type   = views.optString("type");
+          String vusers = views.optString("users");
+          String id     = views.optString("id");
 
-          Log.i("WC","json views: name " + name);
-          Log.i("WC","json views: url" + url);
-          Log.i("WC","json views: typ" + type);
-          Log.i("WC","json views: users" + vusers);
-          Log.i("WC","json views: id" + id);
+          Log.i("WC",func_prefix + "json views: name " + name);
+          Log.i("WC",func_prefix + "json views: url" + url);
+          Log.i("WC",func_prefix + "json views: typ" + type);
+          Log.i("WC",func_prefix + "json views: users" + vusers);
+          Log.i("WC",func_prefix + "json views: id" + id);
           list.add(name + " " + type);
 
           mydb = open_db();
@@ -1914,8 +1923,6 @@ public class wcc_sync extends wcc_activity
       if (temparrlist.size() == 0) {
         Log.e("WC",func_prefix + "returned empty list");
       }
-
-//      EventBus.getDefault().post(new MessageEvent("done_views"));
 
       result_views = "ok";
 
