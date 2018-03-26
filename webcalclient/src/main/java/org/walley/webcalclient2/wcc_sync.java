@@ -1,6 +1,5 @@
 package org.walley.webcalclient2;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,38 +22,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.greenrobot.event.EventBus;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.lang.Runnable;
 import java.text.DateFormat;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -66,7 +54,6 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
-import org.apache.http.StatusLine;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -224,6 +211,7 @@ public class wcc_sync extends wcc_activity
       checkout_db();
     } else {
       Toast.makeText(context, getResources().getString(R.string.no_inet), Toast.LENGTH_LONG).show();
+      global_error = true;
       finish();
     }
   }
@@ -262,77 +250,85 @@ public class wcc_sync extends wcc_activity
   public void onEventMainThread(MessageEvent event)
   /******************************************************************************/
   {
-    Log.i("WC", "onEventMainThread(): " + event.message);
+     Log.i("WC", "onEventMainThread(): got message " + event.message);
 
-    switch (event.message) {
-    case "done_user_list":
-      Log.i("WC", "onEventMainThread(): pb_users_calendars max :" + number_of_users);
-      pb_users_calendars.setMax(number_of_users);
-      cb_user_list.setChecked(true);
-      sync_user_calendars();
-      break;
-    case "user_done":
-      users_progress++;
-      Log.i("WC", "onEventMainThread(): pb_users_calendars users_progress/max :" + users_progress + "/" + number_of_users);
-      pb_users_calendars.setProgress(users_progress);
-      break;
-    case "users_calendars_done":
-      cb_users_calendars.setChecked(true);
-      break;
-      case "error_views":
-        cb_views.setChecked(true);
-        cb_views.setEnabled(false);
-      break;
-      case "done_views":
-        cb_views.setChecked(true);
-        break;
-      case "parsed_view":
-        pb_views.incrementProgressBy(1);
-        break;
-      case "parsed_user":
-      pb_user_list.incrementProgressBy(1);
-      break;
-    case "set_view":
-      Log.i("WC", "onEventMainThread(): set_view param_i :" + event.param_i);
-      pb_views.setMax(event.param_i);
-      break;
-    case "set_user":
-      Log.i("WC", "onEventMainThread(): set_user param_i :" + event.param_i);
-      pb_user_list.setMax(event.param_i);
-      break;
-    case "done_tables":
-      cb_tables.setChecked(true);
-      break;
-    case "sql_table_step":
-      pb_tables.incrementProgressBy(1);
-      break;
-    case "done_owner_month":
-      pb_my_calendar.incrementProgressBy(1);//setProgress(users_progress);
-      break;
-    case "error_owner":
-      result_own_calendar = "error";
-      Toast.makeText(context, getResources().getString(R.string.sync_error), Toast.LENGTH_LONG).show();
-      httpclient.getConnectionManager().shutdown();
-      wake_lock.release();
-      break;
-    case "done_owner":
-      cb_my_calendar.setChecked(true);
-      result_own_calendar = "ok";
-      new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
-      break;
-    case "done_everything":
-      httpclient.getConnectionManager().shutdown();
-      wake_lock.release();
-      Toast.makeText(context, getResources().getString(R.string.sync_done), Toast.LENGTH_LONG).show();
-      sync_result();
-      break;
-    default:
-      break;
-    }
+     switch (event.message) {
+       case "done_user_list":
+         Log.i("WC", "onEventMainThread(): pb_users_calendars max :" + number_of_users);
+         pb_users_calendars.setMax(number_of_users);
+         cb_user_list.setChecked(true);
+         sync_user_calendars();
+         break;
+       case "error_user_list":
+         cb_user_list.setChecked(true);
+         cb_user_list.setEnabled(false);
+         cb_users_calendars.setChecked(true);
+         cb_users_calendars.setEnabled(false);
+         sync_user_calendars();
+         break;
+       case "user_done":
+         users_progress++;
+         Log.i("WC", "onEventMainThread(): pb_users_calendars users_progress/max :" + users_progress + "/" + number_of_users);
+         pb_users_calendars.setProgress(users_progress);
+         break;
+       case "users_calendars_done":
+         cb_users_calendars.setChecked(true);
+         break;
+       case "error_views":
+         cb_views.setChecked(true);
+         cb_views.setEnabled(false);
+         break;
+       case "done_views":
+         cb_views.setChecked(true);
+         break;
+       case "parsed_view":
+         pb_views.incrementProgressBy(1);
+         break;
+       case "parsed_user":
+         pb_user_list.incrementProgressBy(1);
+         break;
+       case "set_view":
+         Log.i("WC", "onEventMainThread(): set_view param_i :" + event.param_i);
+         pb_views.setMax(event.param_i);
+         break;
+       case "set_user":
+         Log.i("WC", "onEventMainThread(): set_user param_i :" + event.param_i);
+         pb_user_list.setMax(event.param_i);
+         break;
+       case "done_tables":
+         cb_tables.setChecked(true);
+         break;
+       case "sql_table_step":
+         pb_tables.incrementProgressBy(1);
+         break;
+       case "done_owner_month":
+         pb_my_calendar.incrementProgressBy(1);//setProgress(users_progress);
+         break;
+       case "error_owner":
+         cb_my_calendar.setChecked(true);
+         cb_my_calendar.setEnabled(false);
+         result_own_calendar = "error";
+         sync_result();
+         new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
+         break;
+       case "done_owner":
+         cb_my_calendar.setChecked(true);
+         result_own_calendar = "ok";
+         new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
+         break;
+       case "done_everything":
+         httpclient.getConnectionManager().shutdown();
+         wake_lock.release();
+         Toast.makeText(context, getResources().getString(R.string.sync_done), Toast.LENGTH_LONG).show();
+         sync_result();
+         break;
+       default:
+         break;
+     }
   }
 
   /******************************************************************************/
-  public void  sync_result()
+  public void sync_result()
   /******************************************************************************/
   {
     sync_tv.append("result_tables:" + result_tables + "\n");
@@ -373,7 +369,6 @@ public class wcc_sync extends wcc_activity
     cb_my_calendar.setClickable(false);
     cb_views.setClickable(false);
     cb_user_list.setClickable(false);
-
   }
 
   /******************************************************************************/
@@ -389,8 +384,8 @@ public class wcc_sync extends wcc_activity
   public void checkout_db()
   /******************************************************************************/
   {
-    Calendar calendar;
-    String owner = prefs.getString("app_username", "owner");
+    //Calendar calendar;
+    //String owner = prefs.getString("app_username", "owner");
 
     String func_prefix = class_prefix + "checkout_db():";
     Log.i("WC", func_prefix + "*** BEGIN SYNCING. ***");
@@ -398,12 +393,13 @@ public class wcc_sync extends wcc_activity
     sync_tv = (TextView) findViewById(R.id.sync_output);
     sync_tv.setText("Debug view - Sync:\n");
 
-    sync_tv.append("tabulky ...\n");
+    sync_tv.append("Vytvarim abulky ...\n");
 
     drop_table();
+    //todo general backup here
+    sync_tv.append("Vytvarim tabulky ...\n");
     create_table();
-
-    sync_tv.append("tabulky vytvoreny ...\n");
+    sync_tv.append("Tabulky vytvoreny ...\n");
 
     HttpParams params = new BasicHttpParams();
     params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -412,7 +408,7 @@ public class wcc_sync extends wcc_activity
     new obtain_list_of_views().execute("");
 
     sync_owner();
-//after "done_owner" message obtain_list_of_users is executed
+    //after "done_owner" message obtain_list_of_users is executed
 
   }
 
@@ -420,8 +416,11 @@ public class wcc_sync extends wcc_activity
   public void sync_owner()
   /******************************************************************************/
   {
+    final String func_prefix = class_prefix + "sync_owner():";
     Calendar calendar;
     String owner = prefs.getString("app_username", "owner");
+
+    sync_tv.append("Sync owner ...\n");
 
 //sync owner
     calendar = Calendar.getInstance();
@@ -464,7 +463,7 @@ public class wcc_sync extends wcc_activity
 
         end_has_been_reached = false;
 
-        Log.i("WC", "sync_owner(): checking for end");
+        Log.i("WC", func_prefix + "checking for end");
 
         boolean x = true;
 
@@ -483,7 +482,10 @@ public class wcc_sync extends wcc_activity
           end_has_been_reached = true;
         }
 
-        if (end_has_been_reached || global_error) {
+        if (global_error) {
+          sync_tv.append("owner sync error\n");
+          EventBus.getDefault().post(new MessageEvent("error_owner"));
+        } else if (end_has_been_reached) {
           sync_tv.append("owner sync done\n");
           EventBus.getDefault().post(new MessageEvent("done_owner"));
         } else {
@@ -783,9 +785,11 @@ public class wcc_sync extends wcc_activity
       EventBus.getDefault().post(new MessageEvent("sql_table_step"));
 
       mydb.close();
+      result_tables = "ok";
     } catch(Exception e) {
       EventBus.getDefault().post(new MessageEvent("table_error"));
       Log.e("WC","Error in creating table");
+      result_tables = "error";
     }
 
     EventBus.getDefault().post(new MessageEvent("done_tables"));
@@ -848,14 +852,6 @@ public class wcc_sync extends wcc_activity
         str_result = IOUtils.toString(is);
         Log.i("WC","obtain_data:  response:\n " + response.getStatusLine() + "\n  string: \n" + str_result);
 
-/*        if (entity != null) {
-          try {
-            entity.consumeContent();
-          } catch (IOException e) {
-            Log.e("WC","obtain_data:get_url(): error entity consume " + e.toString());
-          }
-        }
-*/
         entity_consume_content(entity);
 
       } catch (Exception e) {
@@ -962,13 +958,19 @@ public class wcc_sync extends wcc_activity
         s = get_data();
       } catch (LoginException e) {
         Log.i("WC", func_prefix + "bad pw " + e.toString());
-        login_result = "bad pw";
+        login_result = e.toString();
+        result_own_calendar = "error (" + login_result + ")";
+        return null;
       } catch (ApiException e) {
         Log.i("WC", func_prefix + "wrong api call " + e.toString());
         login_result = "bad url";
+        result_own_calendar = "error (" + login_result + ")";
+        return null;
       } catch (Exception e) {
         Log.i("WC", func_prefix + "error" + e.toString());
         login_result = "error";
+        result_own_calendar = "error (" + login_result + ")";
+        return null;
       }
 
       return s;
@@ -984,6 +986,8 @@ public class wcc_sync extends wcc_activity
         sync_tv.append("Kalendare pro " + user + " za " + month + " chyba " + login_result + "...\n");
         EventBus.getDefault().post(new MessageEvent("error_owner"));
         global_error = true;
+        EventBus.getDefault().post(new MessageEvent("error_data"));
+
         return;
       }
 
@@ -1038,79 +1042,88 @@ public class wcc_sync extends wcc_activity
   /******************************************************************************/
   /******************************************************************************/
   {
-    ArrayList<String> temparrlist = new ArrayList<String>();
-    private String login_result;
+     ArrayList<String> temparrlist = new ArrayList<String>();
+     private String login_result = "ok";
+     private String str_result = "x";
+     HttpResponse response = null;
+     String class_prefix = "wcc_sync.obtain_list_of_users-";
+     String func_prefix = "func_prefix";
 
-    /******************************************************************************/
-    public ArrayList<String> get_users()
-    /******************************************************************************/
-    {
+     /******************************************************************************/
+     private void fetch_data(String server_url)
+     /******************************************************************************/
+     {
+       String func_prefix = class_prefix + "fetch_data():";
+       HttpEntity entity = null;
 
-      HttpResponse response = null;
+       show_cookies(httpclient);
+
+       try {
+         HttpGet httpget = new HttpGet(server_url);
+         httpget.setHeader("Authorization", "Basic " + get_credentials());
+         response = httpclient.execute(httpget);
+         entity = response.getEntity();
+
+         InputStream is = entity.getContent();
+         str_result = IOUtils.toString(is);
+
+         Log.i("WC",func_prefix + "response statusline:" + response.getStatusLine());
+         Log.i("WC",func_prefix + "response string    :" + str_result);
+       } catch (SSLPeerUnverifiedException e) {
+         //something bad with connection (wifi login dialog) fixme
+         login_result = e.toString();
+         Log.e("WC",func_prefix + "SSLPeerUnverifiedException: " + e.toString());
+       } catch (IllegalStateException e) {
+         login_result = e.toString();
+         Log.e("WC",func_prefix + "IllegalStateException: " + e.toString());
+       } catch (Exception e) {
+         Log.e("WC",func_prefix + "Exception: " + e.toString());
+         login_result = e.toString();
+       } finally {
+         entity_consume_content(entity);
+       }
+     }
+
+     /******************************************************************************/
+     public ArrayList<String> get_users() throws LoginException, ApiException
+     /******************************************************************************/
+     {
+      String func_prefix = class_prefix + "get_users():";
+
       HttpEntity entity = null;
-      DefaultHttpClient httpclient = new DefaultHttpClient();
 
-      String str_result = null;
       ArrayList<String> list = new ArrayList<String>();
 
       set_credentials();
+      Log.i("WC",func_prefix + " ****** START ******");
 
-      String url = get_server_url();
+      String url = get_server_url() + "mobile_select_user.php";
 
+      Log.i("WC",func_prefix + "url: " + url);
       Log.i("WC","users: get_users(): Step 1.");
-      try {
-        Log.i("WC","users: get_users(): blah");
-        HttpGet httpget = new HttpGet(url + "mobile_select_user.php");
-        httpget.setHeader("Authorization", "Basic " + get_credentials());
-        response = httpclient.execute(httpget);
-        entity = response.getEntity();
-        Log.i("WC","users: get_users(): response: " + response.getStatusLine());
-      } catch (SSLPeerUnverifiedException e) {
-        Log.e("WC","users: get_users(): error: " + e.toString());
-        entity_consume_content(entity);
-        login_result = "ssl " + e.toString();
-        return list;
-      } catch (Exception e) {
-        Log.e("WC","users: get_users(): error: " + e.toString());
-        entity_consume_content(entity);
-        login_result = e.toString();
-        return list;
-      }
 
-      Log.i("WC"," get_users(): Step 2.");
+      fetch_data(url);
+      if (!login_result.equals("ok")) {
+        throw new LoginException(login_result);
+      }
+      Log.i("WC",func_prefix + "*** Step 2.");
 
       int code = response.getStatusLine().getStatusCode();
 
       if (code == 401) {
         //401 Unauthorized
-        Log.i("WC"," get_users(): 401, not logged in, no or bad intranet password");
-        //prolly bad intranet pwd, return empty list FIXME WAY TO RETURN ERRORS
-        if (entity != null) {
-          try {
-            entity.consumeContent();
-          } catch (IOException e) {
-            Log.e("WC","error " + e.toString());
-          }
-        }
-        //h.show_cookies(httpclient);
-        login_result = getResources().getString(R.string.wrong_password);
-        return list;
-
+        Log.i("WC",func_prefix + " 401, not logged in, no or bad intranet password");
+        login_result = "401, not logged in, no or bad intranet password";
+        //prolly bad intranet pwd
+        show_cookies(httpclient);
+        throw new LoginException("Bad internet login.");
       } else if (code == 200) {
         //200 OK
+        Log.i("WC",func_prefix + " 200, OK");
         login_result = "ok";
 
-        String str = null;
-        try {
-          InputStream is = entity.getContent();
-          str = IOUtils.toString(is);
-        } catch (IOException e) {
-          Log.e("WC","get users() step2 error " + e.toString());
-        }
-        entity_consume_content(entity);
-
-        if (str.contains("error check login")) {
-          Log.i("WC"," get_users(): we need to login ");
+        if (str_result.contains("error check login")) {
+          Log.i("WC",func_prefix + " we need to login ");
           try {
             login_and_get_cookie(httpclient);
           } catch (LoginException e) {
@@ -1118,37 +1131,16 @@ public class wcc_sync extends wcc_activity
             Log.i("WC","get_users(): 200, logged in" + estr);
             login_result = estr;
           }
+          fetch_data(url);
+          if (!login_result.equals("ok")) {
+            throw new LoginException(login_result);
+          }
+
+        } else {
+          Log.i("WC",func_prefix + " logged in");
         }
 
         show_cookies(httpclient);
-      }
-
-      try {
-        Log.i("WC","Step 3.");
-        url = get_server_url();
-        HttpPost httpost2 = new HttpPost(url + "mobile_select_user.php");
-        httpost2.setHeader("Authorization", "Basic " + get_credentials());
-        response = httpclient.execute(httpost2);
-        entity = response.getEntity();
-
-        Log.i("WC","users response: " + response.getStatusLine());
-
-        InputStream inputStream = entity.getContent();
-        str_result = IOUtils.toString(inputStream);
-
-        Log.i("WC","get_users() string: " + str_result);
-
-
-        if (entity != null) {
-          entity.consumeContent();
-        }
-
-        // When HttpClient instance is no longer needed,
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();
-      } catch (Exception e) {
-        Log.e("WC","get users() step 3. error " + e.toString());
       }
 
       try {
@@ -1176,46 +1168,64 @@ public class wcc_sync extends wcc_activity
         Log.e("WC","get_users() json parsing error " + e.toString());
       }
 
-// az onpost      EventBus.getDefault().post(new MessageEvent("done_user_list"));
       number_of_users = list.size();
       return list;
     }
 
-    /******************************************************************************/
-    protected void onPreExecute()
-    /******************************************************************************/
-    {
-//      sync_tv.append("Ctu uzivatele ...\n");
-//      dialog = new ProgressDialog(context);
-//      dialog = ProgressDialog.show(context, null, getResources().getString(R.string.pleasewait));
-    }
+     /******************************************************************************/
+     protected void onPreExecute()
+     /******************************************************************************/
+     {
+      sync_tv.append("Ctu ostatni uzivatele ...\n");
+     }
 
-    /******************************************************************************/
-    protected ArrayList<String> doInBackground(String... connection)
-    /******************************************************************************/
-    {
-      temparrlist = get_users();
-      Log.e("WC","users: doInBackground(): returned");
-      if (temparrlist.size() == 0) {
-        Log.e("WC","users: doInBackground(): returned empty list");
-      }
-      return temparrlist;
-    }
+     /******************************************************************************/
+     protected ArrayList<String> doInBackground(String... connection)
+     /******************************************************************************/
+     {
+       String func_prefix = class_prefix + "doInBackground():";
 
-    /******************************************************************************/
-    protected void onPostExecute(ArrayList<String> result)
-    /******************************************************************************/
-    {
-//      diaLog.iismiss();
-//      Toast.makeText(getApplicationContext(), "result:" + login_result, Toast.LENGTH_LONG).show();
-      Log.i("WC","users final result" + login_result);
+       try {
+         temparrlist = get_users();
+       } catch (LoginException e) {
+         Log.i("WC", func_prefix + "bad pw " + e.toString());
+         login_result = e.toString();
+         result_views = "error (" + login_result + ")";
+         return null;
+       } catch (ApiException e) {
+         Log.i("WC", func_prefix + "wrong api call " + e.toString());
+         login_result = "bad url";
+         result_views = "error (" + login_result + ")";
+         return null;
+       } catch (Exception e) {
+         Log.i("WC", func_prefix + "error" + e.toString());
+         login_result = "error";
+         result_views = "error (" + login_result + ")";
+         return null;
+       }
 
-      sync_tv.append("Uzivatele precteni ...\n");
+       if (temparrlist.size() == 0) {
+         Log.e("WC",func_prefix + "returned empty list");
+       }
 
-      EventBus.getDefault().post(new MessageEvent("done_user_list"));
+       result_users = "ok";
 
-//      sync_user_calendars();
-    }
+       return temparrlist;
+     }
+
+     /******************************************************************************/
+     protected void onPostExecute(ArrayList<String> result)
+     /******************************************************************************/
+     {
+        Log.i("WC", class_prefix + "onPostExecute: final result: " + login_result);
+        sync_tv.append("Ostatni uzivatele precteni ...\n");
+
+        if (result_views.equals("ok")) {
+          EventBus.getDefault().post(new MessageEvent("done_user_list"));
+        } else {
+          EventBus.getDefault().post(new MessageEvent("error_user_list"));
+        }
+     }
   }
 
   /******************************************************************************/
@@ -1646,7 +1656,6 @@ public class wcc_sync extends wcc_activity
     /******************************************************************************/
     {
       dialog.dismiss();
-      Toast.makeText(getApplicationContext(), "result:" + login_result, Toast.LENGTH_LONG).show();
       Log.i("WC","form final result" + login_result);
     }
 
@@ -1740,30 +1749,7 @@ public class wcc_sync extends wcc_activity
       Log.i("WC",func_prefix + "url: " + server_url);
 
       Log.i("WC",func_prefix + "*** Step 1.");
-/*      try {
-        HttpGet httpget = new HttpGet(server_url);
-        httpget.setHeader("Authorization", "Basic " + get_credentials());
-        response = httpclient.execute(httpget);
-        entity = response.getEntity();
-        Log.i("WC",func_prefix + " response: " + response.getStatusLine());
-      } catch (SSLPeerUnverifiedException e) {
-        //something bad with connection (wifi login dialog) fixme
-        login_result = e.toString();
-        Log.e("WC",func_prefix + "SSLPeerUnverifiedException: " + e.toString());
-        entity_consume_content(entity);
-        return null;
-      } catch (IllegalStateException e) {
-        login_result = e.toString();
-        Log.e("WC",func_prefix + "IllegalStateException: " + e.toString());
-        entity_consume_content(entity);
-        return null;
-      } catch (Exception e) {
-        Log.e("WC",func_prefix + "Exception: " + e.toString());
-        login_result = e.toString();
-        entity_consume_content(entity);
-        return null;
-      }
-*/
+
       fetch_data(server_url);
       if (!login_result.equals("ok")) {
         throw new LoginException(login_result);
@@ -1806,39 +1792,6 @@ public class wcc_sync extends wcc_activity
         show_cookies(httpclient);
       }
 
-
-/*      try {
-        Log.i("WC",func_prefix + "*** Step 3.");
-
-        HttpPost httpost2 = new HttpPost(get_server_url() + "mobile_views.php");
-        httpost2.setHeader("Authorization", "Basic " + get_credentials());
-        response = httpclient.execute(httpost2);
-        entity = response.getEntity();
-
-        Log.i("WC",func_prefix + "response: " + response.getStatusLine());
-
-        try {
-          InputStream is = entity.getContent();
-          str_result = IOUtils.toString(is);
-        } catch (IOException e) {
-          Log.e("WC",func_prefix + "error " + e.toString());
-        }
-
-        Log.i("WC",func_prefix + "step #3 result: " + str_result);
-
-        if (entity != null) {
-          entity.consumeContent();
-        }
-
-        // When HttpClient instance is no longer needed,
-        // shut down the connection manager to ensure
-        // immediate deallocation of all system resources
-        httpclient.getConnectionManager().shutdown();
-      } catch (Exception e) {
-        Log.e("WC",func_prefix + "step 3. error " + e.toString());
-        return null;
-      }
-*/
       try {
 
         JSONArray arr = new JSONArray(str_result.trim());
