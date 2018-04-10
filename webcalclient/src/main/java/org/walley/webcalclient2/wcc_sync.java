@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -22,9 +23,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.greenrobot.event.EventBus;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.Runnable;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,8 +65,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class wcc_sync extends wcc_activity
-{
+public class wcc_sync extends wcc_activity {
   LinearLayout Linear;
   SQLiteDatabase mydb;
   SQLiteDatabase mydb2;
@@ -111,66 +117,66 @@ public class wcc_sync extends wcc_activity
   };
 
   private String sql_create_event = ""
-                                    + "create table event"
-                                    + "("
-                                    + "dbid INTEGER PRIMARY KEY,"
-                                    + "starttimestamp integer,"
-                                    + "location text,"
-                                    + "category_number integer,"
-                                    + "label text,"
-                                    + "timestr ext,"
-                                    + "access character,"
-                                    + "type character,"
-                                    + "timetype character,"
-                                    + "endtimestamp integer,"
-                                    + "id integer,"
-                                    + "duration integer,"
-                                    + "time integer,"
-                                    + "title text,"
-                                    + "category_name text ,"
-                                    + "start integer,"
-                                    + "description text,"
-                                    + "priority integer,"
-                                    + "name text,"
-                                    + "linkid text,"
-                                    + "end integer,"
-                                    + "user integer,"
-                                    + "wcc_changed integer,"
-                                    + "participants text,"
-                                    + "externals text,"
-                                    + "cal_id text,"
-                                    + "cal_type text,"
-                                    + "cal_end text,"
-                                    + "cal_frequency text,"
-                                    + "cal_days text,"
-                                    + "cal_endtime text,"
-                                    + "cal_bymonth text,"
-                                    + "cal_bymonthday text,"
-                                    + "cal_byday text,"
-                                    + "cal_bysetpos text,"
-                                    + "cal_byweekno text,"
-                                    + "cal_byyearday text,"
-                                    + "cal_wkst text,"
-                                    + "cal_count text"
-                                    + ");";
+    + "create table event"
+    + "("
+    + "dbid INTEGER PRIMARY KEY,"
+    + "starttimestamp integer,"
+    + "location text,"
+    + "category_number integer,"
+    + "label text,"
+    + "timestr ext,"
+    + "access character,"
+    + "type character,"
+    + "timetype character,"
+    + "endtimestamp integer,"
+    + "id integer,"
+    + "duration integer,"
+    + "time integer,"
+    + "title text,"
+    + "category_name text ,"
+    + "start integer,"
+    + "description text,"
+    + "priority integer,"
+    + "name text,"
+    + "linkid text,"
+    + "end integer,"
+    + "user integer,"
+    + "wcc_changed integer,"
+    + "participants text,"
+    + "externals text,"
+    + "cal_id text,"
+    + "cal_type text,"
+    + "cal_end text,"
+    + "cal_frequency text,"
+    + "cal_days text,"
+    + "cal_endtime text,"
+    + "cal_bymonth text,"
+    + "cal_bymonthday text,"
+    + "cal_byday text,"
+    + "cal_bysetpos text,"
+    + "cal_byweekno text,"
+    + "cal_byyearday text,"
+    + "cal_wkst text,"
+    + "cal_count text"
+    + ");";
 
   private String sql_create_users = ""
-                                    + "create table users"
-                                    + "("
-                                    + "dbid INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                    + "login text,"
-                                    + "name text"
-                                    + ");";
+    + "create table users"
+    + "("
+    + "dbid INTEGER PRIMARY KEY AUTOINCREMENT,"
+    + "login text,"
+    + "name text"
+    + ");";
 
   private String sql_create_views = ""
-                                    + "create table views"
-                                    + "("
-                                    + "dbid INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                    + "name text,"
-                                    + "url text,"
-                                    + "typ text,"
-                                    + "users text,"
-                                    + "id text);";
+    + "create table views"
+    + "("
+    + "dbid INTEGER PRIMARY KEY AUTOINCREMENT,"
+    + "name text,"
+    + "url text,"
+    + "typ text,"
+    + "users text,"
+    + "id text);";
 
   HashMap<String, is_user_done> user_test = new HashMap<String, is_user_done>();
   is_user_done owner_test = new is_user_done();
@@ -195,7 +201,8 @@ public class wcc_sync extends wcc_activity
   WakeLock wake_lock;
 
   /******************************************************************************/
-  @Override public void onStart()
+  @Override
+  public void onStart()
   /******************************************************************************/
   {
     super.onStart();
@@ -207,6 +214,7 @@ public class wcc_sync extends wcc_activity
     users_progress = 0;
 
     if (is_net_available()) {
+      backup_db();
       checkin_db();
       checkout_db();
     } else {
@@ -217,7 +225,8 @@ public class wcc_sync extends wcc_activity
   }
 
   /******************************************************************************/
-  @Override public void onStop()
+  @Override
+  public void onStop()
   /******************************************************************************/
   {
     EventBus.getDefault().unregister(this);
@@ -226,7 +235,8 @@ public class wcc_sync extends wcc_activity
 
 
   /******************************************************************************/
-  @Override public void onCreate(Bundle savedInstanceState)
+  @Override
+  public void onCreate(Bundle savedInstanceState)
   /******************************************************************************/
   {
     super.onCreate(savedInstanceState);
@@ -236,8 +246,8 @@ public class wcc_sync extends wcc_activity
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-    wake_lock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"wcc_sync_tag");
-    wake_lock.acquire(10*60*1000L /*10 minutes*/);
+    wake_lock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wcc_sync_tag");
+    wake_lock.acquire(10 * 60 * 1000L /*10 minutes*/);
 
     prefs = PreferenceManager.getDefaultSharedPreferences(this);
     String months_to_sync = prefs.getString("monthstosync", "1");
@@ -250,81 +260,134 @@ public class wcc_sync extends wcc_activity
   public void onEventMainThread(MessageEvent event)
   /******************************************************************************/
   {
-     Log.i("WC", "onEventMainThread(): got message " + event.message);
+    Log.i("WC", "onEventMainThread(): got message " + event.message);
 
-     switch (event.message) {
-       case "done_user_list":
-         Log.i("WC", "onEventMainThread(): pb_users_calendars max :" + number_of_users);
-         pb_users_calendars.setMax(number_of_users);
-         cb_user_list.setChecked(true);
-         sync_user_calendars();
-         break;
-       case "error_user_list":
-         cb_user_list.setChecked(true);
-         cb_user_list.setEnabled(false);
-         cb_users_calendars.setChecked(true);
-         cb_users_calendars.setEnabled(false);
-         sync_user_calendars();
-         break;
-       case "user_done":
-         users_progress++;
-         Log.i("WC", "onEventMainThread(): pb_users_calendars users_progress/max :" + users_progress + "/" + number_of_users);
-         pb_users_calendars.setProgress(users_progress);
-         break;
-       case "users_calendars_done":
-         cb_users_calendars.setChecked(true);
-         break;
-       case "error_views":
-         cb_views.setChecked(true);
-         cb_views.setEnabled(false);
-         break;
-       case "done_views":
-         cb_views.setChecked(true);
-         break;
-       case "parsed_view":
-         pb_views.incrementProgressBy(1);
-         break;
-       case "parsed_user":
-         pb_user_list.incrementProgressBy(1);
-         break;
-       case "set_view":
-         Log.i("WC", "onEventMainThread(): set_view param_i :" + event.param_i);
-         pb_views.setMax(event.param_i);
-         break;
-       case "set_user":
-         Log.i("WC", "onEventMainThread(): set_user param_i :" + event.param_i);
-         pb_user_list.setMax(event.param_i);
-         break;
-       case "done_tables":
-         cb_tables.setChecked(true);
-         break;
-       case "sql_table_step":
-         pb_tables.incrementProgressBy(1);
-         break;
-       case "done_owner_month":
-         pb_my_calendar.incrementProgressBy(1);//setProgress(users_progress);
-         break;
-       case "error_owner":
-         cb_my_calendar.setChecked(true);
-         cb_my_calendar.setEnabled(false);
-         result_own_calendar = "error";
-         sync_result();
-         new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
-         break;
-       case "done_owner":
-         cb_my_calendar.setChecked(true);
-         result_own_calendar = "ok";
-         new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
-         break;
-       case "done_everything":
-         httpclient.getConnectionManager().shutdown();
-         wake_lock.release();
-         Toast.makeText(context, getResources().getString(R.string.sync_done), Toast.LENGTH_LONG).show();
-         sync_result();
-         break;
-       default:
-         break;
-     }
+    switch (event.message) {
+      case "done_user_list":
+        Log.i("WC", "onEventMainThread(): pb_users_calendars max :" + number_of_users);
+        pb_users_calendars.setMax(number_of_users);
+        cb_user_list.setChecked(true);
+        sync_user_calendars();
+        break;
+      case "error_user_list":
+        cb_user_list.setChecked(true);
+        cb_user_list.setEnabled(false);
+        cb_users_calendars.setChecked(true);
+        cb_users_calendars.setEnabled(false);
+        sync_user_calendars();
+        break;
+      case "user_done":
+        users_progress++;
+        Log.i("WC", "onEventMainThread(): pb_users_calendars users_progress/max :" + users_progress + "/" + number_of_users);
+        pb_users_calendars.setProgress(users_progress);
+        break;
+      case "users_calendars_done":
+        cb_users_calendars.setChecked(true);
+        break;
+      case "error_views":
+        cb_views.setChecked(true);
+        cb_views.setEnabled(false);
+        break;
+      case "done_views":
+        cb_views.setChecked(true);
+        break;
+      case "parsed_view":
+        pb_views.incrementProgressBy(1);
+        break;
+      case "parsed_user":
+        pb_user_list.incrementProgressBy(1);
+        break;
+      case "set_view":
+        Log.i("WC", "onEventMainThread(): set_view param_i :" + event.param_i);
+        pb_views.setMax(event.param_i);
+        break;
+      case "set_user":
+        Log.i("WC", "onEventMainThread(): set_user param_i :" + event.param_i);
+        pb_user_list.setMax(event.param_i);
+        break;
+      case "done_tables":
+        cb_tables.setChecked(true);
+        break;
+      case "sql_table_step":
+        pb_tables.incrementProgressBy(1);
+        break;
+      case "done_owner_month":
+        pb_my_calendar.incrementProgressBy(1);//setProgress(users_progress);
+        break;
+      case "error_owner":
+        cb_my_calendar.setChecked(true);
+        cb_my_calendar.setEnabled(false);
+        result_own_calendar = "error";
+        sync_result();
+        new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
+        break;
+      case "done_owner":
+        cb_my_calendar.setChecked(true);
+        result_own_calendar = "ok";
+        new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
+        break;
+      case "done_everything":
+        httpclient.getConnectionManager().shutdown();
+        wake_lock.release();
+        Toast.makeText(context, getResources().getString(R.string.sync_done), Toast.LENGTH_LONG).show();
+        sync_result();
+        break;
+      default:
+        break;
+    }
+  }
+
+  public void copy_file(String source_file, String destination_file) throws IOException
+  {
+
+    File sf = new File(source_file);
+    File df = new File(destination_file);
+
+/*    if (!df.getParentFile().exists())
+      df.getParentFile().mkdirs();
+*/
+
+    if (!df.exists()) {
+      df.createNewFile();
+    }
+
+    FileChannel source = null;
+    FileChannel destination = null;
+
+    try {
+      source = new FileInputStream(sf).getChannel();
+      destination = new FileOutputStream(df).getChannel();
+      destination.transferFrom(source, 0, source.size());
+    } finally {
+      if (source != null) {
+        source.close();
+      }
+      if (destination != null) {
+        destination.close();
+      }
+    }
+  }
+
+  public void backup_db()
+  {
+    try {
+      copy_file("/data/data/org.walley.webcalclient2/databases/cal.db", "/data/data/org.walley.webcalclient2/databases/cal-backup.db");
+      Toast.makeText(context, "backup ok", Toast.LENGTH_LONG).show();
+    } catch (Exception e) {
+//      Toast.makeText(context, getResources().getString(R.string.no_inet), Toast.LENGTH_LONG).show();
+      Toast.makeText(context, "cannot backup", Toast.LENGTH_LONG).show();
+    }
+  }
+
+  public void restore_db()
+  {
+    try {
+      copy_file("/data/data/org.walley.webcalclient2/databases/cal-backup.db", "/data/data/org.walley.webcalclient2/databases/cal.db");
+      Toast.makeText(context, "restore ok", Toast.LENGTH_LONG).show();
+    } catch (Exception e) {
+//      Toast.makeText(context, getResources().getString(R.string.no_inet), Toast.LENGTH_LONG).show();
+      Toast.makeText(context, "cannot restore", Toast.LENGTH_LONG).show();
+    }
   }
 
   /******************************************************************************/
@@ -583,12 +646,6 @@ public class wcc_sync extends wcc_activity
           if (!d.now || !d.before || !d.after) {
             x = false;
           }
-
-          /*          if (d.now && d.before && d.after && !d.counted) {
-                      d.counted = true;
-                      EventBus.getDefault().post(new MessageEvent("user_done"));
-                    }
-          */
 
           if (x && !d.counted) {
             d.counted = true;
@@ -981,7 +1038,7 @@ public class wcc_sync extends wcc_activity
     /******************************************************************************/
     {
       Log.i("WC",class_prefix + "onPostExecute(): user/month/result:" + user + " " + month + " " + login_result);
-
+//fixme check for null
       if (!login_result.equals("ok")) {
         sync_tv.append("Kalendare pro " + user + " za " + month + " chyba " + login_result + "...\n");
         EventBus.getDefault().post(new MessageEvent("error_owner"));
