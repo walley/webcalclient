@@ -1,7 +1,9 @@
 package org.walley.webcalclient2;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -200,12 +202,17 @@ public class wcc_sync extends wcc_activity {
   CheckBox cb_user_list;
   WakeLock wake_lock;
 
+  AlertDialog.Builder fail_dialog;
+
   /******************************************************************************/
   @Override
   public void onStart()
   /******************************************************************************/
   {
     super.onStart();
+
+    AlertDialog alert = fail_dialog.create();
+    alert.show();
 
     EventBus.getDefault().register(this);
 
@@ -252,6 +259,16 @@ public class wcc_sync extends wcc_activity {
     prefs = PreferenceManager.getDefaultSharedPreferences(this);
     String months_to_sync = prefs.getString("monthstosync", "1");
     mts = Integer.parseInt(months_to_sync);
+
+    fail_dialog = new AlertDialog.Builder(context);
+    fail_dialog.setTitle("Synchronization");
+    fail_dialog.setMessage("Shit happened");
+    fail_dialog.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        // Do nothing, but close the dialog
+        dialog.dismiss();
+      }
+    });
 
     create_ui();
   }
