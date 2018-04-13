@@ -47,6 +47,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
+
 import javax.net.ssl.SSLPeerUnverifiedException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -203,6 +205,7 @@ public class wcc_sync extends wcc_activity {
   WakeLock wake_lock;
 
   AlertDialog.Builder fail_dialog;
+  AlertDialog alert;
 
   /******************************************************************************/
   @Override
@@ -211,8 +214,7 @@ public class wcc_sync extends wcc_activity {
   {
     super.onStart();
 
-    AlertDialog alert = fail_dialog.create();
-    alert.show();
+    alert = fail_dialog.create();
 
     EventBus.getDefault().register(this);
 
@@ -238,8 +240,8 @@ public class wcc_sync extends wcc_activity {
   {
     EventBus.getDefault().unregister(this);
     super.onStop();
+    global_error = true;
   }
-
 
   /******************************************************************************/
   @Override
@@ -262,11 +264,12 @@ public class wcc_sync extends wcc_activity {
 
     fail_dialog = new AlertDialog.Builder(context);
     fail_dialog.setTitle("Synchronization");
-    fail_dialog.setMessage("Shit happened");
+    fail_dialog.setMessage("Synchronisation failed");
     fail_dialog.setNeutralButton("ok", new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int which) {
         // Do nothing, but close the dialog
         dialog.dismiss();
+        finish();
       }
     });
 
@@ -280,6 +283,10 @@ public class wcc_sync extends wcc_activity {
     Log.i("WC", "onEventMainThread(): got message " + event.message);
 
     switch (event.message) {
+      case "users_calendars_done":
+        cb_users_calendars.setChecked(true);
+        sync_tv.append("synchronizace uzivatelskych kalendaru ukoncena...\n");
+        break;
       case "done_user_list":
         Log.i("WC", "onEventMainThread(): pb_users_calendars max :" + number_of_users);
         pb_users_calendars.setMax(number_of_users);
@@ -297,9 +304,6 @@ public class wcc_sync extends wcc_activity {
         users_progress++;
         Log.i("WC", "onEventMainThread(): pb_users_calendars users_progress/max :" + users_progress + "/" + number_of_users);
         pb_users_calendars.setProgress(users_progress);
-        break;
-      case "users_calendars_done":
-        cb_users_calendars.setChecked(true);
         break;
       case "error_views":
         cb_views.setChecked(true);
@@ -335,7 +339,6 @@ public class wcc_sync extends wcc_activity {
         cb_my_calendar.setChecked(true);
         cb_my_calendar.setEnabled(false);
         result_own_calendar = "error";
-        sync_result();
         new obtain_list_of_users().execute("");  //onpostexecute starts sync process for each user
         break;
       case "done_owner":
@@ -347,14 +350,21 @@ public class wcc_sync extends wcc_activity {
         httpclient.getConnectionManager().shutdown();
         wake_lock.release();
         Toast.makeText(context, getResources().getString(R.string.sync_done), Toast.LENGTH_LONG).show();
-        sync_result();
+        if (global_error) {
+          sync_result();
+          alert.show();
+        } else {
+          finish();
+        }
         break;
       default:
         break;
     }
   }
 
+  /******************************************************************************/
   public void copy_file(String source_file, String destination_file) throws IOException
+  /******************************************************************************/
   {
 
     File sf = new File(source_file);
@@ -385,7 +395,9 @@ public class wcc_sync extends wcc_activity {
     }
   }
 
+  /******************************************************************************/
   public void backup_db()
+  /******************************************************************************/
   {
     try {
       copy_file("/data/data/org.walley.webcalclient2/databases/cal.db", "/data/data/org.walley.webcalclient2/databases/cal-backup.db");
@@ -396,7 +408,9 @@ public class wcc_sync extends wcc_activity {
     }
   }
 
+  /******************************************************************************/
   public void restore_db()
+  /******************************************************************************/
   {
     try {
       copy_file("/data/data/org.walley.webcalclient2/databases/cal-backup.db", "/data/data/org.walley.webcalclient2/databases/cal.db");
@@ -464,9 +478,6 @@ public class wcc_sync extends wcc_activity {
   public void checkout_db()
   /******************************************************************************/
   {
-    //Calendar calendar;
-    //String owner = prefs.getString("app_username", "owner");
-
     String func_prefix = class_prefix + "checkout_db():";
     Log.i("WC", func_prefix + "*** BEGIN SYNCING. ***");
 
@@ -476,7 +487,6 @@ public class wcc_sync extends wcc_activity {
     sync_tv.append("Vytvarim abulky ...\n");
 
     drop_table();
-    //todo general backup here
     sync_tv.append("Vytvarim tabulky ...\n");
     create_table();
     sync_tv.append("Tabulky vytvoreny ...\n");
@@ -583,6 +593,7 @@ public class wcc_sync extends wcc_activity {
   {
     ArrayList<String> list = new ArrayList<String>();
     Calendar calendar;
+    final String func_prefix = class_prefix + "sync_user_calendars():";
 
     sync_tv.append("synchronizace uzivatelu ...\n");
     user_test.clear();
@@ -651,8 +662,8 @@ public class wcc_sync extends wcc_activity {
         boolean x = true;
         for (String key : keys) {
           is_user_done d = user_test.get(key);
-          Log.i("WC", "sync_user_calendars(): user " + key + " n/b/a: " + d.now +"/"+ d.before +"/"+ d.after);
-          Log.i("WC", "sync_user_calendars(): user " + key + " months: " + d.get_state() + "counted" + d.counted);
+          Log.i("WC", func_prefix + "user " + key + " n/b/a: " + d.now +"/"+ d.before +"/"+ d.after);
+          Log.i("WC", func_prefix + "user " + key + " months: " + d.get_state() + "counted" + d.counted);
 
           for (int i = 0; i < 12; i++) {
             if (!d.months_array[i]) {
@@ -988,7 +999,7 @@ public class wcc_sync extends wcc_activity {
             login_and_get_cookie(httpclient);
           } catch (LoginException e) {
             String estr =  e.toString();
-            Log.i("WC",func_prefix + "200, logged in" + estr);
+            Log.i("WC",func_prefix + "200, logged in estr:'" + estr +"'");
             login_result = estr;
           }
 
@@ -1239,7 +1250,16 @@ public class wcc_sync extends wcc_activity {
         }
 
       } catch (Exception e) {
-        Log.e("WC","get_users() json parsing error " + e.toString());
+
+        Log.e("WC",func_prefix + "json parsing error " + e.toString());
+        if (str_result.contains("ruckus")) {
+          Log.e("WC",func_prefix + "log into wifi network (ruckus)");
+          login_result = "guest Wifi login";
+        } else {
+          login_result = "error parsing output";
+        }
+        number_of_users = 0;
+        return null;
       }
 
       number_of_users = list.size();
@@ -1264,17 +1284,23 @@ public class wcc_sync extends wcc_activity {
        } catch (LoginException e) {
          Log.i("WC", func_prefix + "bad pw " + e.toString());
          login_result = e.toString();
-         result_views = "error (" + login_result + ")";
+         result_users = "error 1 (" + login_result + ")";
          return null;
        } catch (ApiException e) {
          Log.i("WC", func_prefix + "wrong api call " + e.toString());
          login_result = "bad url";
-         result_views = "error (" + login_result + ")";
+         result_users = "error 2 (" + login_result + ")";
          return null;
        } catch (Exception e) {
          Log.i("WC", func_prefix + "error" + e.toString());
          login_result = "error";
-         result_views = "error (" + login_result + ")";
+         result_users = "error 3 (" + login_result + ")";
+         return null;
+       }
+
+       if (temparrlist == null) {
+         Log.e("WC",func_prefix + "returned null");
+         result_users = "error 4 (" + login_result + ")";
          return null;
        }
 
@@ -1897,7 +1923,15 @@ public class wcc_sync extends wcc_activity {
         }
 
       } catch (Exception e) {
-        Log.e("WC",func_prefix + "error parsing view" + e.toString());
+        Log.e("WC",func_prefix + "error parsing json result" + e.toString());
+
+        if (str_result.contains("ruckus")) {
+          Log.e("WC",func_prefix + "log into wifi network (ruckus)");
+          login_result = "guest Wifi login";
+        } else {
+          login_result = "error parsing output";
+        }
+
         return null;
       }
 
@@ -1925,24 +1959,24 @@ public class wcc_sync extends wcc_activity {
       } catch (LoginException e) {
         Log.i("WC", func_prefix + "bad pw " + e.toString());
         login_result = e.toString();
-        result_views = "error (" + login_result + ")";
+        result_views = "error 1(" + login_result + ")";
         return null;
       } catch (ApiException e) {
         Log.i("WC", func_prefix + "wrong api call " + e.toString());
         login_result = "bad url";
-        result_views = "error (" + login_result + ")";
+        result_views = "error 2 (" + login_result + ")";
         return null;
       } catch (Exception e) {
         Log.i("WC", func_prefix + "error" + e.toString());
         login_result = "error";
-        result_views = "error (" + login_result + ")";
+        result_views = "error 3 (" + login_result + ")";
         return null;
       }
 
       if (temparrlist == null) {
         Log.e("WC",func_prefix + "returned null list");
         global_error = true;
-        result_views = "error (" + login_result + ")";
+        result_views = "error 4 (" + login_result + ")";
         EventBus.getDefault().post(new MessageEvent("error_views"));
         return null;
       }
