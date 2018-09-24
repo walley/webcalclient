@@ -4,19 +4,10 @@ android {
     compileSdkVersion 17
     buildToolsVersion '27.0.3'
 
-    defaultConfig {
-        applicationId "org.walley.webcalclient2"
-        minSdkVersion 14
-        targetSdkVersion 26
-        versionCode 32
-        versionName "1.0.25"
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
     signingConfigs {
         release {
             storeFile file("/home/walley/src/androidkey/my-release-key.keystore")
@@ -25,12 +16,21 @@ android {
             keyPassword "aaaaaa"
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
         }
+    }
+
+    defaultConfig {
+        signingConfig signingConfigs.release
+        applicationId "org.walley.webcalclient2"
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 33
+        versionName "1.0.26"
     }
 
     lintOptions {
@@ -39,10 +39,15 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+    productFlavors {
+    }
+    dexOptions {
+        incremental false
+    }
 }
 
 dependencies {
-    compile project(':ExtendedCalendarView')
-    compile files('libs/commons-io-2.4.jar')
-    compile files('libs/eventbus-2.4.0.jar')
+    implementation project(':ExtendedCalendarView')
+    implementation files('libs/commons-io-2.4.jar')
+    implementation files('libs/eventbus-2.4.0.jar')
 }
