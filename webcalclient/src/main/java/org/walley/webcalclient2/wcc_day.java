@@ -109,9 +109,9 @@ public class wcc_day extends wcc_activity implements OnClickListener
       month = (String) bundle.getString("month");
       year  = (String) bundle.getString("year");
       user  = (String) bundle.getString("user");
-      Log.d("WC","wcc_day onCreate(): " + day + " " + month + " " + year);
+      Log.i("WC","wcc_day onCreate(): " + day + " " + month + " " + year);
     } catch (Exception e) {
-      Log.d("WC", "wcc_day onCreate(): empty intent " + e.toString());
+      Log.e("WC", "wcc_day onCreate(): empty intent " + e.toString());
     }
 
 
@@ -285,7 +285,13 @@ public class wcc_day extends wcc_activity implements OnClickListener
 
     mydb = open_db();
 
+    if (fromrows > torows) {
+      Log.e("WC",func_prefix + "from hour must be lower than to hour");
+    }
+
     for (int i = fromrows; i < torows; i++) {
+
+      Log.i("WC",func_prefix + "row:" + i);
 
       TableRow row = new TableRow(this);
       row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -306,7 +312,7 @@ public class wcc_day extends wcc_activity implements OnClickListener
       l.setOrientation(LinearLayout.VERTICAL);
 
       a = get_hour_events(i_d, i_m, i_y, i);
-      Log.d("WC",func_prefix + "adding events:" + a.size());
+      Log.i("WC",func_prefix + "adding events:" + a.size());
 
       for (String s[] : a) {
 

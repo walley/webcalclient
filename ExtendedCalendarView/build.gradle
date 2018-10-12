@@ -1,11 +1,15 @@
 apply plugin: 'com.android.library'
 android {
-    compileSdkVersion 17
+    compileSdkVersion 26
     buildToolsVersion '27.0.3'
 
-    defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 19
+    signingConfigs {
+        release {
+            keyAlias 'walley'
+            keyPassword 'aaaaaa'
+            storeFile file('/home/walley/src/androidkey/my-release-key.keystore')
+            storePassword 'aaaaaa'
+        }
     }
 
     buildTypes {
@@ -13,6 +17,22 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+        signingConfig signingConfigs.release
+    }
+
+    productFlavors {
+    }
+    dexOptions {
+        incremental false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
