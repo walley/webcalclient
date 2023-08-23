@@ -10,10 +10,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("/home/walley/src/androidkey/my-release-key.keystore")
-            storePassword "aaaaaa"
-            keyAlias "walley"
-            keyPassword "aaaaaa"
+            storeFile file('/home/walley/src/androidkey/my-release-key.keystore')
+            keyAlias 'walley'
+            keyPassword kp['key']
+            storePassword kp['store']
         }
     }
     buildTypes {
